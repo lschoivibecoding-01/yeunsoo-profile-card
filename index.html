@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Profile Card – Product Designer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Theme tokens from theme.json ─────────────────────────────── */
+    :root {
+      --color-primary:    #6366f1;   /* colors.primary           */
+      --color-bg:         #0f172a;   /* colors.background        */
+      --color-card:       rgba(255, 255, 255, 0.1); /* colors.card */
+      --space-padding:    2rem;      /* spacing.padding          */
+      --radius:           16px;      /* spacing.radius           */
+    }
+
+    /* ── Base ─────────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Inter', system-ui, sans-serif;
+      background-color: var(--color-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* ── Ambient orbs (pure CSS, no extra images) ─────────────────── */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(90px);
+      opacity: 0.45;
+      pointer-events: none;
+    }
+    .orb-1 {
+      width: 520px; height: 520px;
+      background: radial-gradient(circle, #6366f1 0%, transparent 70%);
+      top: -160px; left: -160px;
+    }
+    .orb-2 {
+      width: 420px; height: 420px;
+      background: radial-gradient(circle, #8b5cf6 0%, transparent 70%);
+      bottom: -120px; right: -100px;
+    }
+    .orb-3 {
+      width: 260px; height: 260px;
+      background: radial-gradient(circle, #06b6d4 0%, transparent 70%);
+      bottom: 60px; left: 60px;
+      opacity: 0.25;
+    }
+
+    /* ── Card ─────────────────────────────────────────────────────── */
+    .card {
+      background: var(--color-card);
+      backdrop-filter: blur(20px) saturate(160%);
+      -webkit-backdrop-filter: blur(20px) saturate(160%);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: var(--radius);
+      padding: var(--space-padding);
+      width: 360px;
+      position: relative;
+      z-index: 10;
+      box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.45),
+        inset 0 1px 0 rgba(255, 255, 255, 0.12);
+      transform-style: preserve-3d;
+      will-change: transform;
+    }
+
+    /* Vanilla-Tilt injects .js-tilt-glare — style the glare to match glass */
+    .js-tilt-glare {
+      border-radius: var(--radius) !important;
+    }
+    .js-tilt-glare-inner {
+      background: linear-gradient(
+        0deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.22) 100%
+      ) !important;
+    }
+
+    /* thin top-highlight line */
+    .card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: var(--radius);
+      background: linear-gradient(
+        135deg,
+        rgba(255,255,255,0.10) 0%,
+        rgba(255,255,255,0.00) 50%
+      );
+      pointer-events: none;
+    }
+
+    /* ── Avatar ───────────────────────────────────────────────────── */
+    .avatar-wrap {
+      position: relative;
+      width: 72px;
+      height: 72px;
+      margin-bottom: 1rem;
+    }
+    .avatar-wrap::before {
+      content: '';
+      position: absolute;
+      inset: -3px;
+      border-radius: 50%;
+      background: conic-gradient(
+        var(--color-primary),
+        #8b5cf6,
+        #06b6d4,
+        var(--color-primary)
+      );
+      animation: spin 4s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .avatar-wrap::after {
+      content: '';
+      position: absolute;
+      inset: -3px;
+      border-radius: 50%;
+      background: conic-gradient(
+        var(--color-primary),
+        #8b5cf6,
+        #06b6d4,
+        var(--color-primary)
+      );
+      filter: blur(8px);
+      opacity: 0.6;
+      animation: spin 4s linear infinite;
+      z-index: -1;
+    }
+
+    .avatar {
+      position: relative;
+      z-index: 1;
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #fff;
+      border: 2px solid var(--color-bg);
+    }
+
+    /* ── Status dot ───────────────────────────────────────────────── */
+    .status-dot {
+      width: 11px; height: 11px;
+      background: #4ade80;
+      border-radius: 50%;
+      border: 2px solid var(--color-bg);
+      position: absolute;
+      bottom: 2px; right: 2px;
+      z-index: 2;
+      box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.3);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.3); }
+      50%       { box-shadow: 0 0 0 6px rgba(74, 222, 128, 0.1); }
+    }
+
+    /* ── Tags ─────────────────────────────────────────────────────── */
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 500;
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      color: #a5b4fc;
+      letter-spacing: 0.02em;
+    }
+
+    /* ── Stat cards ───────────────────────────────────────────────── */
+    .stat-card {
+      flex: 1;
+      padding: 10px 0;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    /* ── Social buttons ───────────────────────────────────────────── */
+    .social-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px; height: 36px;
+      border-radius: 9999px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: #94a3b8;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+    }
+    .social-btn:hover {
+      background: rgba(99,102,241,0.2);
+      border-color: rgba(99,102,241,0.4);
+      color: #a5b4fc;
+    }
+
+    /* ── CTA button ───────────────────────────────────────────────── */
+    .cta {
+      width: 100%;
+      padding: 10px 0;
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, var(--color-primary), #7c3aed);
+      color: #fff;
+      font-size: 13.5px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      border: none;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: opacity 0.2s, transform 0.15s;
+      box-shadow: 0 4px 20px rgba(99, 102, 241, 0.45);
+    }
+    .cta::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 60%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);
+      transform: skewX(-20deg);
+      transition: left 0.5s;
+    }
+    .cta:hover::before { left: 160%; }
+    .cta:hover { opacity: 0.92; transform: translateY(-1px); }
+    .cta:active { transform: translateY(0); }
+
+    /* ── Divider ──────────────────────────────────────────────────── */
+    .divider { border-color: rgba(255,255,255,0.08); }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient background orbs -->
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <!-- Profile Card -->
+  <div class="card"
+       data-tilt
+       data-tilt-max="12"
+       data-tilt-speed="600"
+       data-tilt-perspective="900"
+       data-tilt-glare="true"
+       data-tilt-max-glare="0.25"
+       data-tilt-glare-prerender="false"
+       data-tilt-reset="true"
+       data-tilt-easing="cubic-bezier(.03,.98,.52,.99)"
+  >
+
+    <!-- Top row: avatar + name + role -->
+    <div class="flex items-start gap-4">
+      <div class="avatar-wrap shrink-0">
+        <div class="avatar">S</div>
+        <div class="status-dot"></div>
+      </div>
+
+      <div class="flex-1 min-w-0 pt-1">
+        <h1 class="text-white font-semibold text-lg leading-snug tracking-tight truncate">
+          Sora Linden
+        </h1>
+        <p class="text-sm mt-0.5" style="color:#94a3b8">Product Designer</p>
+        <div class="flex items-center gap-1 mt-2 flex-wrap">
+          <span class="tag">✦ Available</span>
+          <span class="tag">San Francisco</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Divider -->
+    <hr class="divider my-4 border-t" />
+
+    <!-- Bio -->
+    <p class="text-sm leading-relaxed" style="color:#94a3b8">
+      Crafting delightful digital experiences through thoughtful interaction design,
+      systems thinking, and a relentless obsession with pixel-perfect details.
+    </p>
+
+    <!-- Skills -->
+    <div class="flex flex-wrap gap-1.5 mt-3">
+      <span class="tag">Figma</span>
+      <span class="tag">UX Research</span>
+      <span class="tag">Design Systems</span>
+      <span class="tag">Prototyping</span>
+      <span class="tag">Motion</span>
+    </div>
+
+    <!-- Divider -->
+    <hr class="divider my-4 border-t" />
+
+    <!-- Stats row -->
+    <div class="flex gap-2.5">
+      <div class="stat-card">
+        <p class="text-white font-bold text-lg leading-none">48</p>
+        <p class="text-xs mt-1" style="color:#64748b">Projects</p>
+      </div>
+      <div class="stat-card">
+        <p class="text-white font-bold text-lg leading-none">6 yrs</p>
+        <p class="text-xs mt-1" style="color:#64748b">Experience</p>
+      </div>
+      <div class="stat-card">
+        <p class="text-white font-bold text-lg leading-none">4.9</p>
+        <p class="text-xs mt-1" style="color:#64748b">Rating</p>
+      </div>
+    </div>
+
+    <!-- Divider -->
+    <hr class="divider my-4 border-t" />
+
+    <!-- Social + CTA -->
+    <div class="flex items-center gap-2">
+      <!-- Twitter/X -->
+      <button class="social-btn" title="Twitter / X">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.741l7.73-8.835L1.254 2.25H8.08l4.261 5.635 5.903-5.635Zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+        </svg>
+      </button>
+      <!-- Dribbble -->
+      <button class="social-btn" title="Dribbble">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm6.605 4.061a8.063 8.063 0 0 1 1.954 5.136 21.6 21.6 0 0 0-5.824-.487c-.232-.567-.478-1.124-.739-1.665a21.24 21.24 0 0 0 4.609-2.984zM12 3.955a8.03 8.03 0 0 1 5.304 1.996 19.26 19.26 0 0 1-4.279 2.745A31.26 31.26 0 0 0 9.67 3.967 8.093 8.093 0 0 1 12 3.955zM7.642 4.7a29.33 29.33 0 0 1 3.327 4.665 21.46 21.46 0 0 1-6.51 1.005H4.1A8.076 8.076 0 0 1 7.642 4.7zM3.954 12.01v-.247c.63.016 7.585-.087 10.475-1.354.292.571.567 1.148.825 1.729-3.646 1.028-6.517 3.835-7.938 6.064A8.06 8.06 0 0 1 3.954 12zm4.22 7.523c1.218-2.098 3.83-4.657 7.31-5.665a25.05 25.05 0 0 1 1.3 5.57 8.058 8.058 0 0 1-8.61.095zm10.512-.715a26.95 26.95 0 0 0-1.207-5.203 19.69 19.69 0 0 1 5.04.437 8.072 8.072 0 0 1-3.833 4.766z"/>
+        </svg>
+      </button>
+      <!-- LinkedIn -->
+      <button class="social-btn" title="LinkedIn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+        </svg>
+      </button>
+      <!-- GitHub -->
+      <button class="social-btn" title="GitHub">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/>
+        </svg>
+      </button>
+
+      <!-- CTA -->
+      <button class="cta ml-auto" style="width:auto; padding: 10px 20px;">
+        Hire Me
+      </button>
+    </div>
+
+  </div>
+
+  <script>
+    VanillaTilt.init(document.querySelector(".card"), {
+      max:            12,
+      speed:          600,
+      perspective:    900,
+      glare:          true,
+      "max-glare":    0.25,
+      easing:         "cubic-bezier(.03,.98,.52,.99)",
+      reset:          true,
+    });
+  </script>
+
+</body>
+</html>
